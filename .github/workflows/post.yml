@@ -46,6 +46,7 @@ jobs:
           GROUP_URL:    ${{ github.event.client_payload.group_url }}
           POST_CONTENT: ${{ github.event.client_payload.post_content }}
           FB_COOKIES:   ${{ github.event.client_payload.fb_cookies || secrets.FB_COOKIES }}
+          USER_AGENT:   ${{ github.event.client_payload.user_agent }}
         run: node index.js
 
       # ── 6. Upload debug screenshots on failure ───────────────────────────

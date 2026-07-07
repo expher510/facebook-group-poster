@@ -1,4 +1,4 @@
-﻿// =============================================================================
+// =============================================================================
 //  facebook-group-poster — index.js
 //  Production script: works for Facebook Pages AND Groups
 //  Flow: Open composer → Type text → التالي (Next) → نشر (Post)
@@ -67,7 +67,7 @@ if (!TARGET_URL || !POST_CONTENT || !FB_COOKIES_JSON) {
   process.exit(1);
 }
 
-// Randomised realistic desktop user-agents
+// Randomised realistic desktop user-agents fallback pool
 const USER_AGENTS = [
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -75,12 +75,13 @@ const USER_AGENTS = [
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0",
 ];
-const UA = USER_AGENTS[randInt(0, USER_AGENTS.length - 1)];
+const UA = process.env.USER_AGENT || USER_AGENTS[randInt(0, USER_AGENTS.length - 1)];
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 (async () => {
   console.log("[INFO] Launching browser…");
+  console.log(`[INFO] Using User-Agent: ${UA}`);
   const cookies = JSON.parse(FB_COOKIES_JSON);
 
   const browser = await chromium.launch({
