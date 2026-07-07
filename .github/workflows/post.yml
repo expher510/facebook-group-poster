@@ -1,0 +1,58 @@
+﻿# =============================================================================
+#  .github/workflows/post.yml
+#  Facebook Group Poster — triggered by n8n via repository_dispatch
+# =============================================================================
+
+name: Facebook Group Post
+
+on:
+  repository_dispatch:
+    types: [facebook_post]   # n8n must send this exact event type
+
+# Cancel any in-flight run for the same group to avoid duplicate posts
+concurrency:
+  group: fb-post-${{ github.event.client_payload.group_url }}
+  cancel-in-progress: false
+
+jobs:
+  post-to-facebook:
+    name: Run Playwright Automation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # ── 1. Checkout repository ──────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Set up Node.js ───────────────────────────────────────────────
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      # ── 3. Install Node dependencies ────────────────────────────────────
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      # ── 4. Install Playwright Chromium + system deps ────────────────────
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      # ── 5. Run the automation script ────────────────────────────────────
+      - name: Post to Facebook Group
+        env:
+          GROUP_URL:    ${{ github.event.client_payload.group_url }}
+          POST_CONTENT: ${{ github.event.client_payload.post_content }}
+          FB_COOKIES:   ${{ secrets.FB_COOKIES }}
+        run: node index.js
+
+      # ── 6. Upload debug screenshots on failure ───────────────────────────
+      - name: Upload debug screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-screenshots-${{ github.run_id }}
+          path: "*.png"
+          retention-days: 3

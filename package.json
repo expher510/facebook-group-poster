@@ -1,0 +1,18 @@
+﻿{
+  "name": "facebook-group-poster",
+  "version": "1.0.0",
+  "description": "Automated Facebook Group poster using Playwright – triggered via GitHub Actions by n8n.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "install:browsers": "npx playwright install chromium --with-deps"
+  },
+  "dependencies": {
+    "playwright": "^1.44.0",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "MIT"
+}
